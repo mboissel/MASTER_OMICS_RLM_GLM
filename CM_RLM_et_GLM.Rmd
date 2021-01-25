@@ -52,7 +52,7 @@ On modélise les variables considérées comme des variables aléatoires réelle
 
 + $(x_{1, i}, ..., x_{p,i})$ est une réalisation du vecteur aléatoire réel $(X_1, ..., X_p)$,  
 + sachant que $(X_1, ..., X_p) = (x_{1, i}, ..., x_{p,i})$, $y_i$ est une réalisation de  
-$Y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_pX_{p,i} + \varepsilon_i$,  
+$y_i = \beta_0 + \beta_1 x_{1,i} + ... + \beta_px_{p,i} + \varepsilon_i$,  
 où $\varepsilon_i$ est une variable indépendante de $(X_1, ..., X_p)$ avec $\mathbb{E}(\varepsilon_i)=0$.  
 
 D’autres hypothèses sur les erreurs $\varepsilon_1, ...,\varepsilon_n$ seront formulées ultérieurement.
@@ -153,7 +153,7 @@ En pratique, on considère les réalisations de $\hat{\beta_0},  \hat{\beta_1}, 
 reg <- lm(Y ~ X1 + X2 + X3)
 reg ## les estimations ponctuelles des beta
 ## Pour isoler l'estimation ponctuelle de beta_2, par exemple :
-reg$coeff[3]
+reg$coef[3]
 # Les valeurs prédites moyennes de Y prises aux valeurs des données de X1, X2 et X3 s’obtiennent en faisant :
 predict(reg) # (ou fitted(reg))
 # La valeur prédite moyenne de Y pour la valeur (X1, X2, X3) = (1.2, 2.2, 6) est donnée par les commandes :
