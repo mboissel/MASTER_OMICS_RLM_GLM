@@ -18,7 +18,7 @@ knitr::include_graphics("./Images_includ/logo_univ-lille-large.png")
 
 \newpage 
 
-# Régression linéaire multiple
+# Régression Linéaire Multiple (rlm)
 
 ## Exercice 1 : lecture des sorties
 
@@ -30,7 +30,11 @@ Pour se faire on considère le modèle rlm suivant :
 
 $$Volume = \beta_0 + \beta_1 \times Girth + \beta_2 \times Height +\varepsilon$$
 
-où $\varepsilon \sim \mathcal{N}(0, \sigma^2)$, les paramètres $\beta_0, \beta_1, \beta_2$ et $\sigma$ sont des réels inconnus. On les estime alors avec $n$ observations de $(Volume, Girth, Height)$ par la methède des mco. Un résumé et une visualisation des données est proposé ci-dessous : 
+où $\varepsilon \sim \mathcal{N}(0, \sigma^2)$, les paramètres $\beta_0, \beta_1, \beta_2$ et $\sigma$ sont des réels inconnus. On les estime alors avec $n$ observations de $(Volume, Girth, Height)$ par la méthode des mco (moindres carrées ordinaires). 
+
+=> Exécuter les commandes et répondre aux questions. 
+
+Un résumé et une visualisation des données est proposé ci-dessous : 
 
 ```{r exo1, eval = TRUE, echo = TRUE}
 # head(datasets::trees)
@@ -54,7 +58,7 @@ summary(reg)
 <!-- `coef(reg)` retourne les coefficents, coef(reg)[3] donnera directement Beta2 -->
 <!-- ou  `res <- summary(reg)` et faire `res$coefficients` -->
 
-3/ Est ce que la régression est hautement significative pour `Girth` ? 
+3/ Est-ce que la régression est hautement significative pour `Girth` ? 
 <!-- A lire dans le sortie du summary(reg) -->
 <!-- hautement significatif oui car p-valeur <0.001, symbolisé par *** -->
 
@@ -124,10 +128,10 @@ par(mfrow = c(1, 1)) ## pour remettre les params graphic
 
 9/ Étude de la multicolinéarité : **Règle de Klein**
 
-Pour chaque variable d'un rlm, 2 à 2, Si une ou plusieurs corrélations au carré sont proches du R2 du modèle, alors on soupçonne que les variables associées sont colinéaires.  
+Pour chaque variable d'un modèle de rlm, 2 à 2, Si une ou plusieurs corrélations au carré sont proches du R2 du modèle, alors on soupçonne que les variables associées sont colinéaires.  
 
 Calculer le carré du coefficient de corrélation entre Girth et Height.  
-Ces variables sont-elles colinéaires ? 
+Soupçonne-t-on ces variables d'être colinéaires ? 
 
 ```{r multicor, echo = FALSE, eval = FALSE}
 cor(x = trees$Girth, y = trees$Height)^2
@@ -153,7 +157,7 @@ cook[cook>1]
 
 <!-- aucune distance > 1, pourtant le graphique des résidus `plot(e)`(plus haut) montrait un point un peu éloigné des autres... (le 31). On peut donc regarder d'autres critères (10-B) -->
 
-10-B/ Observations influentes : Pour identifier les observations qui influent le plus dans les estimations (celles dont une faible variation des valeurs induit une modification importante des estimations), plusieurs outils complémentaires existent : les **DFBETAS** (bfb.[nom_de_variable]), les **DFFITS**, les **rapports de covariance** et les **distances de Cook**. Si besoin est, pour identifier les observations influentes, on fait :
+10-B/ Observations influentes : Pour identifier les observations qui influent le plus dans les estimations (celles dont une faible variation des valeurs induit une modification importante des estimations), plusieurs outils complémentaires existent : les **DFBETAS** (bfb.[nom_de_variable]), les **DFFITS**, les **rapports de covariance** et les **distances de Cook**. Si besoin est, pour identifier les observations influentes, on fait  :
 
 ```{r influence, echo = TRUE, eval = FALSE}
 summary(influence.measures(reg))
@@ -179,9 +183,11 @@ mydata$X4 <- rnorm(n = nrow(trees), mean = 60, sd = 3)
 str(mydata)
 ```
 
-N.B. : la fonction `set.seed()` vous permettra de rendre vos simulations reproductibles. Si vous utilisez des fonctions qui généèent des nombres aléatoires (comme `rnorm()` ici), et que vous souhaitez partager les mêmes données avec d'autres personnes ou simplement retrouver les mêmes résultats une prochaine fois, il est important d'utiliser une graine = "seed" donnée. 
+N.B. : la fonction `set.seed()` vous permettra de rendre vos simulations reproductibles. Si vous utilisez des fonctions qui généèent des nombres aléatoires (comme `rnorm()` ici), et que vous souhaitez partager les mêmes données avec d'autres personnes ou simplement retrouver les mêmes résultats une prochaine fois, il est important d'utiliser une graine = "seed" à choisir. 
 
-Pour tester l'influence d'une ou plusieurs variables dans un modèle, tout en prenant en considération les autres variables, on peut utiliser le **test ANOVA** : si p-valeur > 0.05, alors les variables étudiées ne contribuent pas significativement au modèle.
+Pour tester l'influence d'une ou plusieurs variables dans un modèle alternatif, tout en prenant en considération les autres variables, on peut utiliser le **test ANOVA** : Au seuil 5% e.g.  
+Si p-valeur > 0.05, alors les variables étudiées dans le modèle alternatif ne contribuent pas significativement à expliquer notre variable d’intérêt, comparativement au modèle de base".
+
 
 Ici, on veut tester H0 : $\beta_3 = \beta_4 = 0$ en sachant qu'il y a toujours les variables Girth et Height dans le modèle. On effectue :
 
@@ -191,6 +197,7 @@ reg2 = lm(Volume ~ Girth + Height, data = mydata)
 anova(reg1, reg2)
 ```
 
+Reg1 est le modèle alternatif testé, Reg2 est le modèle de base. 
 1/ A la lecture de ces résultats, que pouvez-vous conclure ? 
 
 <!-- On lit la p-valeur = 0.8403 -->
@@ -212,15 +219,15 @@ message("BIC = ", BIC(reg2))
 ```
 
 Votre conclusion change-t-elle avec ces nouveaux résultats ? 
-<!-- Non, le modèle 2 a toujours les plus petites valeurs. -->
+<!-- Non, le modèle Reg2 a toujours les plus petites valeurs. -->
 
 \newpage
 
-# GLM : Régression logistique
+# GLM : Cas Binomial - Régression Logistique
 
 On considère une population P divisée en 2 groupes d’individus G1 et G2 distinguables par des variables $X_1,..., X_p$. Soit Y la variable qualitative valant 1 si l’individu considéré appartient à G1 et 0 sinon. On souhaite expliquer Y à partir de $X_1,..., X_p$.
 
-Dans le cadre d'un Régression logistique, on souhaite estimer la probabilité qu’un individu i vérifiant $(X_1,..., X_p) = x$ appartienne au groupe G1 :  
+Dans le cadre d'une régression logistique, on souhaite estimer la probabilité qu’un individu i vérifiant $(X_1,..., X_p) = x$ appartienne au groupe G1 :  
 
 $$p(x) = \mathbb{P}(\{Y=1\}|x) = \mathbb{E}(Y|x)$$
 $$p(x) = \beta_0 + \beta_1x_1 + ... + \beta_px_p$$
@@ -232,7 +239,7 @@ La transformation logit s'applique donc dans ce cas.
 
 Dans cette configuration, nous utiliserons des données `T2Ddata`, simulées comme suit :  
 
-+ `CC` est la variable binaire qui traduit le statut "cas" (1) pour définir le groupe des enfants diabétiques ou "ctrl", controle, (0) pour définir les enfants non diabétiques. 
++ `CC` est la variable qualitative binaire qui traduit le statut "cas" (1) pour définir le groupe des individus diabétiques et "ctrl", contrôle, (0) pour définir les individus non diabétiques. 
 + `weight` la variable numérique qui représente le poids des individus.  
 
 ```{r T2Ddata, echo = TRUE, eval = TRUE}
@@ -260,15 +267,16 @@ summary(reg)
 
 3/ **Rapport des côtes** ou **odds ratio**  
 
-Si $X_j$ augmente d’une unité, alors le rapport des côtes est $RC_j = \mathbb{exp}(\beta_j)$.   
+**Définition : i $X_j$ augmente d’une unité, alors le rapport des côtes est $RC_j = \mathbb{exp}(\beta_j)$.**    
 
 Par conséquent,  
 
-+ si $RC_j$ > 1, l’augmentation d’une unité de Xj entraîne une augmentation des chances que {Y = 1} se réalise,  
-+ si $RC_j$ = 1, l’augmentation d’une unité de Xj n’a pas d’impact sur Y ,  
-+ si $RC_j$ < 1, l’augmentation d’une unité de Xj entraîne une augmentation des chances que {Y = 0} se réalise.
++ si **$RC_j$ > 1**, l’augmentation d’une unité de Xj entraîne une **augmentation des chances que {Y = 1} se réalise**,  
++ si **$RC_j$ = 1**, l’augmentation d’une unité de **Xj n’a pas d’impact sur Y**,  
+En effet, si $\beta_j = 0$, alors $RC_j = \mathbb{exp}(0) = 1$  
++ si **$RC_j$ < 1**, l’augmentation d’une unité de Xj entraîne une **augmentation des chances que {Y = 0} se réalise**.
 
-Calculer l'odd ration de weight.  
+=> Calculer l'odd ratio de weight.  
 
 <!-- Dans R, on obtient ces valeurs comme suit :  -->
 
@@ -300,7 +308,7 @@ OR2 = exp(coef(reg2))
 OR2
 ```
 
-<!-- Le graphique nous montre une très nette partition entre les mesures (on pourrait tracé un trait net vertical) -->
+<!-- Le graphique nous montre une très nette partition entre les mesures (on pourrait tracer un trait net vertical) -->
 <!-- A la réalisation du GLM : Le warning suivant s'affiche :  -->
 <!-- Warning messages: -->
 <!-- 1: glm.fit: l'algorithme n'a pas convergé  -->
@@ -415,5 +423,3 @@ reg2 = step(reg, direction = "both", k = 2)
 summary(reg2)
 # Pour considérer le BIC, on prend k = log(length(Y))
 ``` 
-
-
