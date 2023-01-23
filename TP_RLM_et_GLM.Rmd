@@ -221,6 +221,32 @@ message("BIC = ", BIC(reg2))
 Votre conclusion change-t-elle avec ces nouveaux résultats ? 
 <!-- Non, le modèle Reg2 a toujours les plus petites valeurs. -->
 
+
+3/ Question Suppl : Tester la selection de modèle
+
+```{r selection1, echo = TRUE, eval=TRUE}
+library(stats)
+head(swiss)
+summary(lm1 <- lm(Fertility ~ ., data = swiss))
+slm1 <- step(lm1)
+summary(slm1)
+slm1$anova
+```
+
+```{r selection2, echo = TRUE, eval=TRUE}
+library(stats)
+set.seed(25012021)
+mydata$X5 <- rnorm(n = nrow(trees), mean = 42, sd = 3)
+str(mydata)
+# Pour utiliser l'approche pas à pas avec le AIC, puis obtenir les résultats statistiques associés au modèle sélectionné :
+reg = lm(Volume ~ Girth + Height + X3 + X4 + X5, data = mydata)
+?step
+reg_select <- step(reg, direction = "backward", k = 2)
+summary(reg_select)
+## essayez l'argument keep 
+```
+
+
 \newpage
 
 # GLM : Cas Binomial - Régression Logistique
